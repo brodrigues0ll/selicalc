@@ -3,7 +3,7 @@ import './App.css';
 
 function App() {
   const [stringRes, setApiResponse] = useState();
-  const [valorAplicado, setValorAplicado] = useState('');
+  const [valorAplicado, setValorAplicado] = useState(undefined);
 
   useEffect(() => {
     async function getDataFromApi() {
@@ -22,9 +22,16 @@ function App() {
   const floatRes = parseFloat(stringRes);
   const floatValApl = parseFloat(valorAplicado);
 
+  const moneyFormatter = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 2,
+  });
+
+
   return (
     <div className="App">
-      <h1>Cáuculo de Rendimento Selic</h1>
+      <h1>Cálculo de Rendimento Selic</h1>
       <p>A taxa selic hoje é de {stringRes}% ao ano</p>
 
       <label htmlFor="valor_aplicacao">
@@ -39,9 +46,9 @@ function App() {
         />
       </label>
 
-      { valorAplicado === ''
-        ? ''
-        : <p>R${ (((floatValApl + (floatRes/100*floatValApl)) - floatValApl) / 12).toFixed(2) } por mês</p> }
+      {valorAplicado === '' || valorAplicado === undefined
+        ? <p>{moneyFormatter.format('000')} por mês </p>
+        : <p>{moneyFormatter.format((((floatValApl + (floatRes / 100 * floatValApl)) - floatValApl) / 12).toFixed(2))} por mês</p>}
 
     </div>
   );
