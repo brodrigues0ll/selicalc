@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import './App.css';
+import NumberFormat from 'react-number-format';
 
 function App() {
   const [stringRes, setApiResponse] = useState();
@@ -19,8 +20,11 @@ function App() {
     getDataFromApi();
   }, []);
 
-  const floatRes = parseFloat(stringRes);
-  const floatValApl = parseFloat(valorAplicado);
+  //Cálculos
+  const taxaSelic = parseFloat(stringRes);
+  const dinheiroInvestido = parseFloat(valorAplicado);
+
+  const ResultadoBruto = (dinheiroInvestido + ( (taxaSelic / 100) * dinheiroInvestido ) - dinheiroInvestido) / 12;
 
   const moneyFormatter = new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -28,28 +32,25 @@ function App() {
     minimumFractionDigits: 2,
   });
 
-
   return (
     <div className="App">
       <h1>Cálculo de Rendimento Selic</h1>
       <p>A taxa selic hoje é de {stringRes}% ao ano</p>
 
-      <label htmlFor="valor_aplicacao">
+      <label htmlFor="valor_aplicado">
         Valor a ser Aplicado:
         {' '}
-        <input
-          type="number"
-          min="0.00"
-          max="10000.00"
-          step="0.01"
-          onChange={event => setValorAplicado(event.target.value)}
+        <NumberFormat
+          thousandSeparator={'.'}
+          prefix={'R$ '}
+          decimalSeparator={','}
+          onChange={event => setValorAplicado(event.target.value.replace(/[^0-9]/g, ''))}
         />
       </label>
 
       {valorAplicado === '' || valorAplicado === undefined
         ? <p>{moneyFormatter.format('000')} por mês </p>
-        : <p>{moneyFormatter.format((((floatValApl + (floatRes / 100 * floatValApl)) - floatValApl) / 12).toFixed(2))} por mês</p>}
-
+        : <p>{moneyFormatter.format(ResultadoBruto.toFixed(2))} por mês</p>}
     </div>
   );
 }
